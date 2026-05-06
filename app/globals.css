@@ -59,7 +59,7 @@ body {
 
   /* Sidebar item */
   .sidebar-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all;
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-medium transition-all;
   }
 
   .sidebar-item-default {
@@ -72,35 +72,43 @@ body {
 
   /* Buttons */
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
-           bg-gradient-to-b from-gold-300 to-gold-500 text-navy-500 font-semibold text-sm
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl
+           bg-gradient-to-b from-gold-300 to-gold-500 text-navy-500 font-semibold text-[15px]
            shadow-[0_4px_18px_-4px_rgba(212,168,83,0.55),inset_0_1px_0_0_rgba(255,255,255,0.25)]
            hover:from-gold-200 hover:to-gold-400 transition-all
            hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
+    @apply inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl
            bg-white/[0.06] hover:bg-white/[0.10] border border-white/[0.10]
-           text-white/85 hover:text-white font-medium text-sm transition-all;
+           text-white/90 hover:text-white font-medium text-[15px] transition-all;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
-           text-white/65 hover:text-white hover:bg-white/[0.06] font-medium text-sm transition-all;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+           text-white/70 hover:text-white hover:bg-white/[0.06] font-medium text-[14px] transition-all;
   }
 
-  /* Inputs */
+  /* Inputs — note: do NOT include horizontal padding here, so consumers can
+     mix `pl-11` (icon-prefixed inputs) with `pr-4` etc. without specificity
+     wars. Default horizontal padding is provided by `.input-field-px` for
+     fields without an icon. */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08]
-           text-white placeholder:text-white/30 text-sm
+    @apply w-full py-3.5 rounded-xl bg-white/[0.04] border border-white/[0.08]
+           text-white placeholder:text-white/35 text-[15px]
            focus:outline-none focus:border-gold-400/50 focus:bg-white/[0.06]
            transition-all;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .input-field.has-icon-left {
+    padding-left: 2.75rem;  /* 44px — leaves room for icon at left-4 (16px + ~16px icon) */
   }
 
   /* Action button pills (E / P / D) */
   .action-pill {
-    @apply inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all hover:scale-110;
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-lg text-[13px] font-bold transition-all hover:scale-110;
   }
   .action-pill-edit {
     @apply bg-amber-500/15 text-amber-400 border border-amber-500/25 hover:bg-amber-500/25;
@@ -114,11 +122,11 @@ body {
 
   /* Status badges */
   .badge-enabled {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[12px] font-semibold tracking-wide
            bg-emerald-500/15 text-emerald-400 border border-emerald-500/25;
   }
   .badge-disabled {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[12px] font-semibold tracking-wide
            bg-red-500/15 text-red-400 border border-red-500/25;
   }
 

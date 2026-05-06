@@ -16,7 +16,8 @@ export type CustomerFormValues = {
 
   brand: string | null;
   model: string | null;
-  imei_serial: string | null;
+  imei_serial: string;        // required — primary IMEI
+  imei2_serial: string | null; // optional — dual-SIM
   product_value: number;
 
   plan_id: number | null;
@@ -70,6 +71,7 @@ export default function CustomerForm({
     brand: initial?.brand ?? "",
     model: initial?.model ?? "",
     imei_serial: initial?.imei_serial ?? "",
+    imei2_serial: initial?.imei2_serial ?? "",
     product_value: initial?.product_value ?? 0,
     plan_id: initial?.plan_id ?? plans[0]?.id ?? null,
     retailer_id: initial?.retailer_id ?? null,
@@ -127,6 +129,14 @@ export default function CustomerForm({
       setError("Please select a plan.");
       return;
     }
+    if (!values.retailer_id) {
+      setError("Please select a retailer (merchant).");
+      return;
+    }
+    if (!values.imei_serial?.trim()) {
+      setError("IMEI 1 is required.");
+      return;
+    }
     setSaving(true);
     try {
       await onSubmit(values);
@@ -141,7 +151,7 @@ export default function CustomerForm({
     <form onSubmit={handleSubmit} className="space-y-7">
       {/* ── CUSTOMER DETAILS ─────────────────────────────────────────── */}
       <section>
-        <h3 className="text-[10px] font-semibold tracking-[0.22em] uppercase text-gold-400/80 mb-3">
+        <h3 className="text-[12px] font-semibold tracking-[0.22em] uppercase text-gold-400/90 mb-4">
           Customer Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -243,7 +253,7 @@ export default function CustomerForm({
 
       {/* ── PRODUCT DETAILS ──────────────────────────────────────────── */}
       <section>
-        <h3 className="text-[10px] font-semibold tracking-[0.22em] uppercase text-gold-400/80 mb-3">
+        <h3 className="text-[12px] font-semibold tracking-[0.22em] uppercase text-gold-400/90 mb-4">
           Product Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,17 +277,35 @@ export default function CustomerForm({
             />
           </Field>
 
-          <Field label="IMEI / Serial Number">
+          <Field label="IMEI 1" required hint="Primary IMEI — printed on the device or in *#06# dial">
             <input
               type="text"
-              value={values.imei_serial ?? ""}
+              required
+              value={values.imei_serial}
               onChange={(e) => set("imei_serial", e.target.value.replace(/\s/g, ""))}
               placeholder="15-digit IMEI"
+              maxLength={20}
               className="input-field font-mono"
             />
           </Field>
 
-          <Field label="Product Value (₹)" required hint="Used to compute plan + GST">
+          <Field label="IMEI 2" hint="Second IMEI for dual-SIM devices (optional)">
+            <input
+              type="text"
+              value={values.imei2_serial ?? ""}
+              onChange={(e) => set("imei2_serial", e.target.value.replace(/\s/g, ""))}
+              placeholder="15-digit IMEI (optional)"
+              maxLength={20}
+              className="input-field font-mono"
+            />
+          </Field>
+
+          <Field
+            label="Product Value (₹)"
+            required
+            hint="Used to compute plan + GST"
+            className="md:col-span-2"
+          >
             <input
               type="number"
               required
@@ -293,7 +321,7 @@ export default function CustomerForm({
 
       {/* ── PLAN SELECTION ───────────────────────────────────────────── */}
       <section>
-        <h3 className="text-[10px] font-semibold tracking-[0.22em] uppercase text-gold-400/80 mb-3">
+        <h3 className="text-[12px] font-semibold tracking-[0.22em] uppercase text-gold-400/90 mb-4">
           Plan & Retailer
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -315,15 +343,24 @@ export default function CustomerForm({
             </select>
           </Field>
 
-          <Field label="Retailer (Merchant)">
+          <Field
+            label="Retailer (Merchant)"
+            required
+            hint={
+              retailers.length === 0
+                ? "Add a retailer first in the Retailers section."
+                : undefined
+            }
+          >
             <select
+              required
               value={values.retailer_id ?? ""}
               onChange={(e) =>
                 set("retailer_id", e.target.value ? Number(e.target.value) : null)
               }
               className="input-field"
             >
-              <option value="" className="bg-[#0A1628]">-- None --</option>
+              <option value="" className="bg-[#0A1628]">-- Select retailer --</option>
               {retailers.map((r) => (
                 <option key={r.id} value={r.id} className="bg-[#0A1628]">
                   {r.shop_name} ({r.retailer_code})

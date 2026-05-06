@@ -73,8 +73,8 @@ export default function DataTable<T extends { id: number | string }>({
     <div className="space-y-4">
       {/* Toolbar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-semibold tracking-[0.18em] uppercase text-white/40">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/45">
             Show
           </span>
           <select
@@ -83,7 +83,7 @@ export default function DataTable<T extends { id: number | string }>({
               setPageSize(Number(e.target.value));
               setPage(1);
             }}
-            className="px-3 py-1.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white text-xs focus:outline-none focus:border-gold-400/50"
+            className="px-3.5 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-white text-[13px] focus:outline-none focus:border-gold-400/50"
           >
             {pageSizes.map((s) => (
               <option key={s} value={s} className="bg-[#0A1628]">
@@ -91,11 +91,11 @@ export default function DataTable<T extends { id: number | string }>({
               </option>
             ))}
           </select>
-          <span className="text-[11px] text-white/40">per page</span>
+          <span className="text-[12px] text-white/45">per page</span>
         </div>
 
-        <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35" />
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <input
             type="text"
             placeholder="Search..."
@@ -104,7 +104,7 @@ export default function DataTable<T extends { id: number | string }>({
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="input-field !py-2 pl-10 text-xs"
+            className="input-field has-icon-left !py-2.5 !text-[14px]"
           />
         </div>
       </div>
@@ -112,13 +112,13 @@ export default function DataTable<T extends { id: number | string }>({
       {/* Table */}
       <div className="glass rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-[14px]">
             <thead>
               <tr className="border-b border-white/[0.06] bg-white/[0.02]">
                 {columns.map((c) => (
                   <th
                     key={c.key}
-                    className={`px-4 py-3.5 text-left text-[10px] font-semibold tracking-[0.18em] uppercase text-white/45 whitespace-nowrap ${
+                    className={`px-5 py-4 text-left text-[11px] font-semibold tracking-[0.18em] uppercase text-white/55 whitespace-nowrap ${
                       c.width ?? ""
                     } ${c.className ?? ""}`}
                   >
@@ -126,7 +126,7 @@ export default function DataTable<T extends { id: number | string }>({
                   </th>
                 ))}
                 {actions && (
-                  <th className="px-4 py-3.5 text-right text-[10px] font-semibold tracking-[0.18em] uppercase text-white/45">
+                  <th className="px-5 py-4 text-right text-[11px] font-semibold tracking-[0.18em] uppercase text-white/55">
                     Action
                   </th>
                 )}
@@ -137,15 +137,15 @@ export default function DataTable<T extends { id: number | string }>({
                 <tr>
                   <td
                     colSpan={columns.length + (actions ? 1 : 0)}
-                    className="px-4 py-16 text-center"
+                    className="px-4 py-20 text-center"
                   >
-                    <Inbox className="w-8 h-8 mx-auto text-white/20 mb-3" />
-                    <p className="font-display text-base text-white/70 mb-1">
+                    <Inbox className="w-10 h-10 mx-auto text-white/20 mb-4" />
+                    <p className="font-display text-lg text-white/75 mb-1.5">
                       {filtered.length === 0 && search
                         ? "No results match your search."
                         : emptyTitle}
                     </p>
-                    <p className="text-xs text-white/40">
+                    <p className="text-[13px] text-white/45">
                       {filtered.length === 0 && search
                         ? "Try a different search term."
                         : emptyDescription}
@@ -161,7 +161,7 @@ export default function DataTable<T extends { id: number | string }>({
                     {columns.map((c) => (
                       <td
                         key={c.key}
-                        className={`px-4 py-3.5 text-white/85 ${c.className ?? ""}`}
+                        className={`px-5 py-4 text-white/90 ${c.className ?? ""}`}
                       >
                         {c.render
                           ? c.render(row)
@@ -169,8 +169,8 @@ export default function DataTable<T extends { id: number | string }>({
                       </td>
                     ))}
                     {actions && (
-                      <td className="px-4 py-3.5">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-2">
                           {actions(row)}
                         </div>
                       </td>
@@ -184,34 +184,34 @@ export default function DataTable<T extends { id: number | string }>({
 
         {/* Footer: pagination */}
         {filtered.length > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-t border-white/[0.06]">
-            <p className="text-xs text-white/45">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-5 py-4 border-t border-white/[0.06]">
+            <p className="text-[13px] text-white/55">
               Showing{" "}
-              <span className="text-white/80 font-semibold">
+              <span className="text-white/90 font-semibold">
                 {startIdx + 1}
               </span>{" "}
               to{" "}
-              <span className="text-white/80 font-semibold">
+              <span className="text-white/90 font-semibold">
                 {Math.min(startIdx + pageSize, filtered.length)}
               </span>{" "}
               of{" "}
-              <span className="text-white/80 font-semibold">
+              <span className="text-white/90 font-semibold">
                 {filtered.length}
               </span>{" "}
               entries
             </p>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={safePage === 1}
-                className="px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all flex items-center gap-1"
+                className="px-3.5 py-2 rounded-lg text-[13px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all flex items-center gap-1"
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
+                <ChevronLeft className="w-4 h-4" />
                 Prev
               </button>
 
-              <div className="flex items-center gap-0.5">
+              <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }).slice(
                   Math.max(0, safePage - 3),
                   Math.max(0, safePage - 3) + 5
@@ -223,10 +223,10 @@ export default function DataTable<T extends { id: number | string }>({
                     <button
                       key={pageNum}
                       onClick={() => setPage(pageNum)}
-                      className={`w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
+                      className={`w-9 h-9 rounded-lg text-[13px] font-semibold transition-all ${
                         isActive
                           ? "bg-gradient-to-b from-gold-300 to-gold-500 text-navy-500"
-                          : "text-white/65 hover:text-white hover:bg-white/[0.06]"
+                          : "text-white/70 hover:text-white hover:bg-white/[0.06]"
                       }`}
                     >
                       {pageNum}
@@ -238,10 +238,10 @@ export default function DataTable<T extends { id: number | string }>({
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={safePage === totalPages}
-                className="px-3 py-1.5 rounded-lg text-xs text-white/65 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all flex items-center gap-1"
+                className="px-3.5 py-2 rounded-lg text-[13px] font-medium text-white/70 hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-all flex items-center gap-1"
               >
                 Next
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>

@@ -90,7 +90,8 @@ create table if not exists public.customers (
   -- Product details
   brand               text,
   model               text,
-  imei_serial         text,
+  imei_serial         text,                            -- IMEI 1 (primary)
+  imei2_serial        text,                            -- IMEI 2 (dual-SIM devices)
   product_value       numeric(10,2) not null default 0,
 
   -- Plan + retailer linkage

@@ -135,7 +135,7 @@ export default function RetailersPage() {
     <>
       <div className="space-y-6 max-w-[1400px]">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-white/55">
+          <p className="text-[15px] text-white/65 leading-relaxed">
             Partner mobile shops authorised to sell warranty plans.
           </p>
           <motion.button

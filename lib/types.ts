@@ -54,6 +54,7 @@ export type Customer = {
   brand: string | null;
   model: string | null;
   imei_serial: string | null;
+  imei2_serial: string | null;
   product_value: number;
 
   plan_id: number | null;

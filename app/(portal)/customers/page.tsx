@@ -140,17 +140,23 @@ export default function CustomersPage() {
       label: "Device",
       render: (r) => (
         <div className="leading-tight">
-          <p className="text-white/85 text-[13px]">
+          <p className="text-white/90 text-[14px]">
             {[r.brand, r.model].filter(Boolean).join(" ") || "—"}
           </p>
           {r.imei_serial && (
-            <p className="font-mono text-[10px] text-white/40 mt-0.5">
-              {r.imei_serial}
+            <p className="font-mono text-[11px] text-white/45 mt-1">
+              IMEI 1: {r.imei_serial}
+            </p>
+          )}
+          {r.imei2_serial && (
+            <p className="font-mono text-[11px] text-white/45">
+              IMEI 2: {r.imei2_serial}
             </p>
           )}
         </div>
       ),
-      searchValue: (r) => `${r.brand ?? ""} ${r.model ?? ""} ${r.imei_serial ?? ""}`,
+      searchValue: (r) =>
+        `${r.brand ?? ""} ${r.model ?? ""} ${r.imei_serial ?? ""} ${r.imei2_serial ?? ""}`,
     },
     {
       key: "plan",
@@ -199,7 +205,7 @@ export default function CustomersPage() {
     <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <p className="text-sm text-white/55 max-w-xl">
+          <p className="text-[15px] text-white/65 max-w-xl leading-relaxed">
             Customers enrolled in warranty plans. Use the{" "}
             <span className="text-emerald-400 font-semibold">P</span> button to
             download their warranty document.
@@ -238,7 +244,7 @@ export default function CustomersPage() {
             )}
             emptyTitle="No customers yet"
             emptyDescription="Register your first customer to issue a warranty document."
-            searchKeys={["customer_code", "mobile", "imei_serial", "city"]}
+            searchKeys={["customer_code", "mobile", "imei_serial", "imei2_serial", "city"]}
           />
         )}
       </div>

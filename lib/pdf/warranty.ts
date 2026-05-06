@@ -161,9 +161,9 @@ export function generateWarrantyPDF(customer: CustomerWithRelations) {
     ["Category", "Smartphone"],
     ["Brand", customer.brand || "—"],
     ["Model", customer.model || "—"],
-    ["IMEI / Serial No.", customer.imei_serial || "—"],
+    ["IMEI 1", customer.imei_serial || "—"],
+    ["IMEI 2", customer.imei2_serial || "—"],
     ["Product Value", `₹${fmtINR(customer.product_value)}`],
-    ["", ""],
   ]);
 
   // ─────────────────────────────────────────────────────────────────────
