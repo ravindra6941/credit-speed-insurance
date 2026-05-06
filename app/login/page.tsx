@@ -8,7 +8,6 @@ import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +19,10 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
+    // Lazy-init the client at submit time (not at render time) so that
+    // build-time SSR doesn't crash on preview deployments where the
+    // NEXT_PUBLIC_SUPABASE_* env vars may not be available.
+    const supabase = createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,

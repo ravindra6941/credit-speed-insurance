@@ -3,6 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 
+// Auth check happens on every request — skip static generation entirely
+// (env vars don't exist at build time on preview deployments).
+export const dynamic = "force-dynamic";
+
 export default async function PortalLayout({
   children,
 }: {
