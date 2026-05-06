@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Credit Speed Insurance — Admin Portal
 
-## Getting Started
+Internal admin portal for the Credit Speed insurance vertical. Built for the
+team to manage retailers, customers, and warranty plans, and to issue
+warranty PDF documents that get attached to loan files.
 
-First, run the development server:
+## Stack
+
+- **Next.js 14** (App Router, TypeScript)
+- **Supabase** — PostgreSQL + Auth (free tier)
+- **Tailwind CSS** + **framer-motion** — cinematic dark UI matching the Credit Speed brand
+- **jsPDF** — client-side warranty PDF generation
+- **Vercel** — hosting
+
+## First-time setup
+
+### 1. Create a Supabase project
+
+1. Go to [supabase.com](https://supabase.com) → **New Project**
+2. Pick the **free tier**, region: **Mumbai (ap-south-1)**
+3. Save the **DB password** somewhere safe
+
+### 2. Run the schema
+
+1. In Supabase: **SQL Editor → New query**
+2. Paste the entire contents of [`supabase/schema.sql`](./supabase/schema.sql)
+3. Run
+
+This creates the `profiles`, `plans`, `retailers`, `customers` tables, sets
+up Row Level Security, seeds the 4 default plans, and adds helper functions
+for auto-generating customer / retailer codes.
+
+### 3. Create the first admin user
+
+1. Supabase: **Authentication → Users → Add user → Create new user**
+2. Email: your team email, Password: choose a strong one
+3. **Auto Confirm User: ON**
+4. After creation, run this in the SQL Editor to make them admin:
+
+   ```sql
+   update public.profiles
+   set role = 'admin'
+   where id = (select id from auth.users where email = 'YOUR_EMAIL');
+   ```
+
+### 4. Wire up env vars
+
+1. Copy `.env.local.example` to `.env.local`
+2. From Supabase: **Settings → API**, copy:
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+   - **anon public key** → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 5. Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` → you'll be redirected to `/login`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Pages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Route | Purpose |
+|---|---|
+| `/login` | Email + password (Supabase Auth) |
+| `/dashboard` | Stat cards — customers + retailers across Today/Week/Month/All |
+| `/customers` | CRUD + **P** button generates warranty PDF (jsPDF) |
+| `/retailers` | CRUD for partner mobile shops |
+| `/plans` | CRUD for warranty plan types (admin masters) |
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Push to GitHub, import into Vercel, set the same two env vars in Vercel
+project settings → done.
