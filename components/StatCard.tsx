@@ -31,14 +31,14 @@ export default function StatCard({
         <Icon className="w-5 h-5" />
       </div>
 
-      <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-white/40 mb-1.5">
+      <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-white/45 mb-2">
         {label}
       </p>
-      <p className="font-display text-3xl text-white tracking-tight leading-none">
+      <p className="font-display text-4xl text-white tracking-tight leading-none">
         {value}
       </p>
       {subValue && (
-        <p className="mt-2 text-[11px] text-gold-400/80 font-medium">
+        <p className="mt-2.5 text-[13px] text-gold-400/90 font-semibold">
           {subValue}
         </p>
       )}

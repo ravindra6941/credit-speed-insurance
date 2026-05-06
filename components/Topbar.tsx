@@ -18,14 +18,14 @@ export default function Topbar() {
 
   return (
     <header className="sticky top-0 z-20 backdrop-blur-xl bg-[#050B17]/70 border-b border-white/[0.06]">
-      <div className="px-8 py-5 flex items-center justify-between">
+      <div className="px-8 py-6 flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-1.5 text-[11px] text-white/35 tracking-wide mb-1">
+          <div className="flex items-center gap-1.5 text-[12px] text-white/45 tracking-wide mb-1.5 font-medium">
             <span>Insurance Portal</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-gold-400/80">{title}</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+            <span className="text-gold-400/90">{title}</span>
           </div>
-          <h1 className="font-display text-2xl lg:text-3xl text-white tracking-tight leading-none">
+          <h1 className="font-display text-3xl lg:text-4xl text-white tracking-tight leading-none">
             {title}
           </h1>
         </div>

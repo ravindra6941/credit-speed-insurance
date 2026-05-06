@@ -8,7 +8,6 @@ import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,6 +19,10 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
+    // Lazy-init the client at submit time (not at render time) so that
+    // build-time SSR doesn't crash on preview deployments where the
+    // NEXT_PUBLIC_SUPABASE_* env vars may not be available.
+    const supabase = createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -66,7 +69,7 @@ export default function LoginPage() {
           <div className="inline-block">
             <Logo size="lg" variant="lockup" />
           </div>
-          <p className="mt-6 text-white/55 text-sm">
+          <p className="mt-7 text-white/65 text-[15px] leading-relaxed">
             Internal admin portal — sign in to continue.
           </p>
         </div>
@@ -79,7 +82,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="email"
-              className="block text-[11px] font-semibold tracking-[0.18em] uppercase text-white/45 mb-2"
+              className="block text-[12px] font-semibold tracking-[0.16em] uppercase text-white/55 mb-2.5"
             >
               Email
             </label>
@@ -93,7 +96,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@creditspeed.in"
-                className="input-field pl-11"
+                className="input-field has-icon-left"
               />
             </div>
           </div>
@@ -101,7 +104,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="password"
-              className="block text-[11px] font-semibold tracking-[0.18em] uppercase text-white/45 mb-2"
+              className="block text-[12px] font-semibold tracking-[0.16em] uppercase text-white/55 mb-2.5"
             >
               Password
             </label>
@@ -115,7 +118,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="input-field pl-11"
+                className="input-field has-icon-left"
               />
             </div>
           </div>
@@ -124,7 +127,7 @@ export default function LoginPage() {
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-start gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-sm"
+              className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-300 text-[14px]"
             >
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <span>{error}</span>
@@ -134,7 +137,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-gold w-full !py-3.5 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="btn-gold w-full !py-4 !text-[16px] disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -146,7 +149,7 @@ export default function LoginPage() {
             )}
           </button>
 
-          <p className="text-center text-xs text-white/40 pt-2">
+          <p className="text-center text-[13px] text-white/45 pt-2">
             Access is restricted to authorized team members.
           </p>
         </form>

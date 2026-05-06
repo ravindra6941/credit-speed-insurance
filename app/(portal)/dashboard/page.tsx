@@ -60,10 +60,10 @@ export default async function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gold-400/80 mb-1.5">
+            <p className="text-[12px] font-semibold tracking-[0.22em] uppercase text-gold-400/90 mb-2">
               Customers
             </p>
-            <h2 className="font-display text-xl text-white">
+            <h2 className="font-display text-2xl text-white">
               Warranty registrations
             </h2>
           </div>
@@ -87,10 +87,10 @@ export default async function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gold-400/80 mb-1.5">
+            <p className="text-[12px] font-semibold tracking-[0.22em] uppercase text-gold-400/90 mb-2">
               Retailers
             </p>
-            <h2 className="font-display text-xl text-white">
+            <h2 className="font-display text-2xl text-white">
               Partner shops onboarded
             </h2>
           </div>
@@ -112,10 +112,10 @@ export default async function DashboardPage() {
       {/* Empty-state hint when nothing exists yet */}
       {customerStats[3].count === 0 && retailerStats[3].count === 0 && (
         <div className="glass-strong rounded-2xl p-8 text-center">
-          <p className="font-display text-xl text-white mb-2">
+          <p className="font-display text-2xl text-white mb-3">
             Welcome to Credit Speed Insurance.
           </p>
-          <p className="text-white/55 text-sm max-w-md mx-auto">
+          <p className="text-white/65 text-[15px] max-w-md mx-auto leading-relaxed">
             Start by adding your first retailer in the Retailers section, then
             register customers under that retailer to issue warranty documents.
           </p>

@@ -23,7 +23,7 @@ export default function RowActions({ onEdit, onPrint, onDelete }: RowActionsProp
           aria-label="Edit"
           className="action-pill action-pill-edit"
         >
-          <Pencil className="w-3.5 h-3.5" />
+          <Pencil className="w-4 h-4" />
         </button>
       )}
       {onPrint && (
@@ -34,7 +34,7 @@ export default function RowActions({ onEdit, onPrint, onDelete }: RowActionsProp
           aria-label="Print warranty PDF"
           className="action-pill action-pill-print"
         >
-          <Printer className="w-3.5 h-3.5" />
+          <Printer className="w-4 h-4" />
         </button>
       )}
       {onDelete && (
@@ -45,7 +45,7 @@ export default function RowActions({ onEdit, onPrint, onDelete }: RowActionsProp
           aria-label="Delete"
           className="action-pill action-pill-delete"
         >
-          <Trash2 className="w-3.5 h-3.5" />
+          <Trash2 className="w-4 h-4" />
         </button>
       )}
     </>

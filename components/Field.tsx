@@ -23,15 +23,15 @@ export default function Field({
 }: FieldProps) {
   return (
     <div className={className}>
-      <label className="block text-[11px] font-semibold tracking-[0.18em] uppercase text-white/45 mb-2">
+      <label className="block text-[12px] font-semibold tracking-[0.16em] uppercase text-white/55 mb-2.5">
         {label} {required && <span className="text-gold-400">*</span>}
       </label>
       {children}
       {hint && !error && (
-        <p className="mt-1.5 text-[11px] text-white/40">{hint}</p>
+        <p className="mt-2 text-[12px] text-white/45 leading-relaxed">{hint}</p>
       )}
       {error && (
-        <p className="mt-1.5 text-[11px] text-red-400">{error}</p>
+        <p className="mt-2 text-[12px] text-red-400 leading-relaxed">{error}</p>
       )}
     </div>
   );
