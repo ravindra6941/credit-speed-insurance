@@ -12,7 +12,7 @@ const fmtINR = (n: number) =>
   }).format(n || 0);
 
 export default async function DashboardPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Date helpers — IST
   const now = new Date();

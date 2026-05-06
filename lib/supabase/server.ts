@@ -3,9 +3,12 @@ import { cookies } from "next/headers";
 
 /**
  * Server-side Supabase client (use in Server Components / Route Handlers / Server Actions).
+ *
+ * NOTE: Async since Next.js 15 — `cookies()` returns a Promise. All callers
+ * must `await createClient()`.
  */
-export function createClient() {
-  const cookieStore = cookies();
+export async function createClient() {
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
