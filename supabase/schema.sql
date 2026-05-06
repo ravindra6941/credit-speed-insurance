@@ -173,3 +173,26 @@ create or replace function public.next_retailer_code()
 returns text language sql as $$
   select 'CSINS-R' || lpad((coalesce((select max(substring(retailer_code from 8)::int) from public.retailers where retailer_code like 'CSINS-R%'), 0) + 1)::text, 4, '0');
 $$;
+
+-- ---------------------------------------------------------------------------
+-- GRANTS — required for tables created via raw SQL (Supabase auto-grants
+-- only apply to tables created through the dashboard).
+-- ---------------------------------------------------------------------------
+grant select, insert, update, delete on public.plans     to authenticated;
+grant select, insert, update, delete on public.retailers to authenticated;
+grant select, insert, update, delete on public.customers to authenticated;
+grant select, update                  on public.profiles  to authenticated;
+
+grant usage, select on sequence public.plans_id_seq     to authenticated;
+grant usage, select on sequence public.retailers_id_seq to authenticated;
+grant usage, select on sequence public.customers_id_seq to authenticated;
+
+grant execute on function public.next_customer_code() to authenticated;
+grant execute on function public.next_retailer_code() to authenticated;
+
+alter default privileges in schema public
+  grant select, insert, update, delete on tables to authenticated;
+alter default privileges in schema public
+  grant usage, select on sequences to authenticated;
+alter default privileges in schema public
+  grant execute on functions to authenticated;
