@@ -340,10 +340,12 @@ export default function CustomerForm({
             <input
               type="number"
               required
-              min={0}
+              min={1}
               step={0.01}
-              value={values.product_value}
-              onChange={(e) => set("product_value", Number(e.target.value))}
+              // Display empty when 0 (so the field doesn't pre-fill with "0")
+              value={values.product_value || ""}
+              onChange={(e) => set("product_value", Number(e.target.value) || 0)}
+              placeholder="e.g. 15000"
               className="input-field"
             />
           </Field>
