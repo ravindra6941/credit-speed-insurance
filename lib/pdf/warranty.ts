@@ -12,7 +12,7 @@ import { CustomerWithRelations } from "@/lib/types";
 const COMPANY = {
   name: "Credit Speed Microfinance Private Limited",
   address: "Office address opening soon — Uttar Pradesh, India",
-  email: "ravindrasingh258241@gmail.com",
+  email: "admin@creditspeed.in",
   phone: "+91 88249 20949",
 } as const;
 

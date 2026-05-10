@@ -95,7 +95,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@creditspeed.in"
+                placeholder="admin@creditspeed.in"
                 className="input-field has-icon-left"
               />
             </div>
