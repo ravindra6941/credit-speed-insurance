@@ -133,8 +133,20 @@ export default function CustomerForm({
       setError("Please select a retailer (merchant).");
       return;
     }
-    if (!values.imei_serial?.trim()) {
-      setError("IMEI 1 is required.");
+    if (!/^\d{10}$/.test(values.mobile)) {
+      setError("Mobile must be exactly 10 digits.");
+      return;
+    }
+    if (!/^\d{15}$/.test(values.imei_serial)) {
+      setError("IMEI 1 must be exactly 15 digits.");
+      return;
+    }
+    if (values.imei2_serial && !/^\d{15}$/.test(values.imei2_serial)) {
+      setError("IMEI 2 must be exactly 15 digits (or leave empty).");
+      return;
+    }
+    if (values.pin_code && !/^\d{6}$/.test(values.pin_code)) {
+      setError("PIN code must be exactly 6 digits.");
       return;
     }
     setSaving(true);
@@ -203,17 +215,20 @@ export default function CustomerForm({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-          <Field label="City">
+          <Field label="City" required>
             <input
               type="text"
+              required
               value={values.city ?? ""}
               onChange={(e) => set("city", e.target.value)}
+              placeholder="e.g. Kanpur"
               className="input-field"
             />
           </Field>
 
-          <Field label="State">
+          <Field label="State" required>
             <select
+              required
               value={values.state ?? ""}
               onChange={(e) => set("state", e.target.value)}
               className="input-field"
@@ -226,22 +241,27 @@ export default function CustomerForm({
             </select>
           </Field>
 
-          <Field label="PIN Code">
+          <Field label="PIN Code" required hint="6-digit Indian PIN">
             <input
               type="text"
+              required
               inputMode="numeric"
+              pattern="[0-9]{6}"
               maxLength={6}
+              minLength={6}
               value={values.pin_code ?? ""}
               onChange={(e) => set("pin_code", e.target.value.replace(/\D/g, ""))}
+              placeholder="208001"
               className="input-field font-mono"
             />
           </Field>
         </div>
 
         <div className="mt-4">
-          <Field label="Address">
+          <Field label="Address" required>
             <textarea
               rows={2}
+              required
               value={values.address ?? ""}
               onChange={(e) => set("address", e.target.value)}
               placeholder="Full residential address"
@@ -257,9 +277,10 @@ export default function CustomerForm({
           Product Details
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Brand">
+          <Field label="Brand" required>
             <input
               type="text"
+              required
               value={values.brand ?? ""}
               onChange={(e) => set("brand", e.target.value)}
               placeholder="e.g. Vivo, Samsung, Realme"
@@ -267,9 +288,10 @@ export default function CustomerForm({
             />
           </Field>
 
-          <Field label="Model">
+          <Field label="Model" required>
             <input
               type="text"
+              required
               value={values.model ?? ""}
               onChange={(e) => set("model", e.target.value)}
               placeholder="e.g. T5X 5G 8/256GB"
@@ -277,25 +299,34 @@ export default function CustomerForm({
             />
           </Field>
 
-          <Field label="IMEI 1" required hint="Primary IMEI — printed on the device or in *#06# dial">
+          <Field
+            label="IMEI 1"
+            required
+            hint="15 digits — printed on the device or shown via *#06# dial"
+          >
             <input
               type="text"
               required
+              inputMode="numeric"
+              pattern="[0-9]{15}"
+              minLength={15}
+              maxLength={15}
               value={values.imei_serial}
-              onChange={(e) => set("imei_serial", e.target.value.replace(/\s/g, ""))}
+              onChange={(e) => set("imei_serial", e.target.value.replace(/\D/g, ""))}
               placeholder="15-digit IMEI"
-              maxLength={20}
               className="input-field font-mono"
             />
           </Field>
 
-          <Field label="IMEI 2" hint="Second IMEI for dual-SIM devices (optional)">
+          <Field label="IMEI 2" hint="15 digits — optional, for dual-SIM devices">
             <input
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]{15}"
+              maxLength={15}
               value={values.imei2_serial ?? ""}
-              onChange={(e) => set("imei2_serial", e.target.value.replace(/\s/g, ""))}
+              onChange={(e) => set("imei2_serial", e.target.value.replace(/\D/g, ""))}
               placeholder="15-digit IMEI (optional)"
-              maxLength={20}
               className="input-field font-mono"
             />
           </Field>
@@ -309,10 +340,12 @@ export default function CustomerForm({
             <input
               type="number"
               required
-              min={0}
+              min={1}
               step={0.01}
-              value={values.product_value}
-              onChange={(e) => set("product_value", Number(e.target.value))}
+              // Display empty when 0 (so the field doesn't pre-fill with "0")
+              value={values.product_value || ""}
+              onChange={(e) => set("product_value", Number(e.target.value) || 0)}
+              placeholder="e.g. 15000"
               className="input-field"
             />
           </Field>
@@ -369,9 +402,10 @@ export default function CustomerForm({
             </select>
           </Field>
 
-          <Field label="Warranty Start">
+          <Field label="Warranty Start" required>
             <input
               type="date"
+              required
               value={values.warranty_start}
               onChange={(e) => set("warranty_start", e.target.value)}
               className="input-field"

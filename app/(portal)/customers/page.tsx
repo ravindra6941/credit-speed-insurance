@@ -104,9 +104,9 @@ export default function CustomersPage() {
     }
   };
 
-  const handlePrint = (c: CustomerWithRelations) => {
+  const handlePrint = async (c: CustomerWithRelations) => {
     try {
-      generateWarrantyPDF(c);
+      await generateWarrantyPDF(c);
     } catch (err) {
       console.error(err);
       alert("Failed to generate PDF. Check the browser console for details.");
