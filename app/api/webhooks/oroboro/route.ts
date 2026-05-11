@@ -20,6 +20,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { buildWarrantyDoc, warrantyPdfFilename } from "@/lib/pdf/warranty";
+import { sendWarrantyEmails } from "@/lib/email/send-warranty";
 import type { CustomerWithRelations, Plan, Retailer } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -169,13 +170,15 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (existing) {
-    // Already processed — return the same PDF + customer
+    // Already processed — return the same PDF + customer. We deliberately
+    // DO NOT re-email on retries so we don't spam the customer/Oroboro
+    // if their side retries the webhook on a transient error.
     const customerRow = existing as unknown as CustomerWithRelations;
     const doc = buildWarrantyDoc(customerRow);
     return NextResponse.json({
       ok: true,
       idempotent: true,
-      message: "Already processed — returning cached customer + freshly-built PDF",
+      message: "Already processed — returning cached customer + freshly-built PDF (no re-email)",
       customer_code: customerRow.customer_code,
       pdf_filename: warrantyPdfFilename(customerRow),
       pdf_base64: doc.output("datauristring"),
@@ -235,18 +238,25 @@ export async function POST(req: NextRequest) {
   // ─── 9. Build the warranty PDF ────────────────────────────────────
   const customerRow = inserted as unknown as CustomerWithRelations;
   const doc = buildWarrantyDoc(customerRow);
+  const pdfBuffer = Buffer.from(doc.output("arraybuffer"));
+  const pdfFilename = warrantyPdfFilename(customerRow);
 
-  // ─── 10. Tomorrow: email/WhatsApp the PDF here ────────────────────
-  // Stub for now — once Resend is wired we'll do:
-  //   await sendWarrantyEmail({ to: ORO_OPS_INBOX, customer: customerRow, pdf: doc.output("arraybuffer") });
-  //   await sendWarrantyEmail({ to: customer.email, ... });
+  // ─── 10. Email fan-out — customer + Oroboro ops + our admin inbox ─
+  // Non-blocking failure-tolerant: if Resend fails we still 200 with the
+  // PDF in the response. Per-recipient status is included so Oroboro can
+  // see which addresses got the email and which didn't.
+  const delivery = await sendWarrantyEmails({
+    customer: customerRow,
+    pdfBuffer,
+    pdfFilename,
+  });
 
   return NextResponse.json({
     ok: true,
     idempotent: false,
     customer_code: nextCode,
     customer_id: customerRow.id,
-    pdf_filename: warrantyPdfFilename(customerRow),
+    pdf_filename: pdfFilename,
     pdf_base64: doc.output("datauristring"),
     warranty: {
       start_date: warrantyStart,
@@ -256,5 +266,6 @@ export async function POST(req: NextRequest) {
       gst_amount: Number(gstAmount.toFixed(2)),
       total_amount: Number(totalAmount.toFixed(2)),
     },
+    delivery, // { customer: {to, ok, id?, error?}, oroboro: {...}, ours: {...} }
   });
 }
