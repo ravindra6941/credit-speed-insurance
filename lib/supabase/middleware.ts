@@ -40,6 +40,7 @@ export async function updateSession(request: NextRequest) {
     pathname === "/login" ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/_next") ||
+    pathname.startsWith("/api/webhooks/") || // server-to-server, own auth (bearer token)
     pathname === "/favicon.ico";
 
   // Not signed in + visiting a protected route → redirect to /login

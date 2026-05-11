@@ -79,6 +79,7 @@ create table if not exists public.retailers (
 create table if not exists public.customers (
   id                  serial primary key,
   customer_code       text unique not null,        -- e.g. "CSINS-C0001"
+  external_loan_id    text,                        -- Oroboro's loan id (idempotency key)
   name                text not null,
   mobile              text not null,
   email               text,

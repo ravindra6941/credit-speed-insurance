@@ -43,6 +43,7 @@ export type Retailer = {
 export type Customer = {
   id: number;
   customer_code: string;
+  external_loan_id: string | null;
   name: string;
   mobile: string;
   email: string | null;

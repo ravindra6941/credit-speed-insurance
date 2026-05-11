@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import { CustomerWithRelations } from "@/lib/types";
+import { LOGO_PNG_DATA_URI } from "./logo-data";
 
 /**
  * Warranty Pack — modelled exactly on the reference layout the team is
@@ -7,8 +8,13 @@ import { CustomerWithRelations } from "@/lib/types";
  * header bars, 4-column key/value tables with thin grey borders, black
  * body text, centered company footer.
  *
- * Async because we load the brand logo SVG and rasterize it via the
- * canvas API before adding to the PDF.
+ * Two entry points, both portable across browser + Node:
+ *   - buildWarrantyDoc(customer)   → returns a jsPDF instance (no save)
+ *   - generateWarrantyPDF(customer) → calls .save() (browser/file download)
+ *
+ * Use buildWarrantyDoc in server contexts (e.g. webhook handlers) and
+ * call .output() on it to get a Buffer / base64 string for email
+ * attachment.
  */
 
 const COMPANY = {
@@ -40,44 +46,16 @@ const fmtDate = (d: string | null | undefined) => {
   });
 };
 
-/** Fetch /logo.svg, draw it on a canvas, return base64 PNG data URL. */
-async function loadLogoAsPng(size = 200): Promise<string | null> {
-  if (typeof window === "undefined") return null;
-  try {
-    const res = await fetch("/logo.svg");
-    if (!res.ok) return null;
-    const svgText = await res.text();
-    const blob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-
-    return await new Promise<string | null>((resolve) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          URL.revokeObjectURL(url);
-          return resolve(null);
-        }
-        ctx.drawImage(img, 0, 0, size, size);
-        URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = () => {
-        URL.revokeObjectURL(url);
-        resolve(null);
-      };
-      img.src = url;
-    });
-  } catch {
-    return null;
-  }
-}
-
-export async function generateWarrantyPDF(customer: CustomerWithRelations) {
+/**
+ * Build a warranty PDF document in memory. Portable — runs in Node and
+ * in the browser. Doesn't trigger any download.
+ *
+ * From the returned jsPDF:
+ *   const buffer = Buffer.from(doc.output("arraybuffer"));    // Node
+ *   const base64 = doc.output("datauristring");               // any
+ *   doc.save("filename.pdf");                                  // browser
+ */
+export function buildWarrantyDoc(customer: CustomerWithRelations): jsPDF {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -85,16 +63,15 @@ export async function generateWarrantyPDF(customer: CustomerWithRelations) {
   let y = 30;
 
   // ─────────────────────────────────────────────────────────────────────
-  //  HEADER — centered logo
+  //  HEADER — centered logo (inline base64 PNG, works server + client)
   // ─────────────────────────────────────────────────────────────────────
-  const logoPng = await loadLogoAsPng(220);
-  if (logoPng) {
+  try {
     const logoW = 55;
     const logoH = 55;
-    doc.addImage(logoPng, "PNG", pageWidth / 2 - logoW / 2, y, logoW, logoH);
+    doc.addImage(LOGO_PNG_DATA_URI, "PNG", pageWidth / 2 - logoW / 2, y, logoW, logoH);
     y += logoH + 6;
-  } else {
-    // Fallback — text wordmark if logo couldn't load
+  } catch {
+    // Fallback — text wordmark if image add fails
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
     doc.setTextColor("#0A1628");
@@ -338,9 +315,24 @@ export async function generateWarrantyPDF(customer: CustomerWithRelations) {
     { align: "center" }
   );
 
-  // ─────────────────────────────────────────────────────────────────────
-  //  Save
-  // ─────────────────────────────────────────────────────────────────────
+  return doc;
+}
+
+/**
+ * Build the suggested filename for a customer's warranty PDF.
+ * Used by both client-side download + server-side email attachment.
+ */
+export function warrantyPdfFilename(customer: CustomerWithRelations): string {
   const safeName = (customer.name || "customer").replace(/\s+/g, "_");
-  doc.save(`Warranty_${customer.customer_code}_${safeName}.pdf`);
+  return `Warranty_${customer.customer_code}_${safeName}.pdf`;
+}
+
+/**
+ * Client-side helper — builds the warranty doc and triggers a browser
+ * download. Wraps buildWarrantyDoc() so existing callers don't have to
+ * change. Synchronous now (logo is inlined, no async load needed).
+ */
+export function generateWarrantyPDF(customer: CustomerWithRelations): void {
+  const doc = buildWarrantyDoc(customer);
+  doc.save(warrantyPdfFilename(customer));
 }
