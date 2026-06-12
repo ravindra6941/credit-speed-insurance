@@ -47,6 +47,13 @@ const addMonths = (iso: string, months: number) => {
   return d.toISOString().slice(0, 10);
 };
 
+// Extended-warranty coverage begins AFTER the OEM's 1-year warranty expires:
+//   warranty_start = purchase_date + 12 months
+//   warranty_end   = warranty_start + plan.duration_months
+// (Matches the live Oroboro/Credit Kuber model — purchase 11-06-2026 →
+//  coverage 11-06-2027 → 11-06-2028.)
+const OEM_WARRANTY_MONTHS = 12;
+
 export default function CustomerForm({
   initial,
   plans,
@@ -82,6 +89,14 @@ export default function CustomerForm({
     warranty_end: initial?.warranty_end ?? null,
     status: initial?.status ?? "enabled",
   });
+  // Purchase date is what staff actually knows. For an existing record it is
+  // derived back from the stored warranty_start (start − 12 months); for a new
+  // customer it defaults to today. Not persisted — warranty_start/end are.
+  const [purchaseDate, setPurchaseDate] = useState<string>(
+    initial?.warranty_start
+      ? addMonths(initial.warranty_start, -OEM_WARRANTY_MONTHS)
+      : today()
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,15 +109,18 @@ export default function CustomerForm({
   );
 
   // ──────────────────────────────────────────────────────────────────
-  //  AUTO-CALC: every time plan or product_value changes, recalculate
-  //  plan_amount, gst_amount, total_amount, and warranty_end.
+  //  AUTO-CALC: every time plan, product_value or purchase date changes,
+  //  recalculate plan_amount, gst_amount, total_amount, and BOTH dates.
   //
-  //  Formula (matches Credit Kuber's pricing model):
+  //  Formula (verified against Credit Kuber's live system, 2026-06):
   //    plan_amount = product_value * (plan.plan_amount / 100)
   //                  → "AMS Amount" is treated as percentage of product value
   //    gst_amount  = plan_amount * (plan.gst_percentage / 100)
   //    total       = plan_amount + gst_amount
-  //    warranty_end = warranty_start + plan.duration_months
+  //
+  //  Coverage is YEAR 2 — it begins when the OEM's 1-year warranty ends:
+  //    warranty_start = purchase_date + 12 months
+  //    warranty_end   = warranty_start + plan.duration_months
   // ──────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!selectedPlan) return;
@@ -110,17 +128,19 @@ export default function CustomerForm({
       Number(values.product_value || 0) * (Number(selectedPlan.plan_amount) / 100);
     const gstAmount = planAmount * (Number(selectedPlan.gst_percentage) / 100);
     const total = planAmount + gstAmount;
-    const end = addMonths(values.warranty_start, selectedPlan.duration_months);
+    const start = addMonths(purchaseDate, OEM_WARRANTY_MONTHS);
+    const end = addMonths(start, selectedPlan.duration_months);
 
     setValues((p) => ({
       ...p,
       plan_amount: Number(planAmount.toFixed(2)),
       gst_amount: Number(gstAmount.toFixed(2)),
       total_amount: Number(total.toFixed(2)),
+      warranty_start: start,
       warranty_end: end,
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values.plan_id, values.product_value, values.warranty_start, selectedPlan?.plan_amount, selectedPlan?.gst_percentage, selectedPlan?.duration_months]);
+  }, [values.plan_id, values.product_value, purchaseDate, selectedPlan?.plan_amount, selectedPlan?.gst_percentage, selectedPlan?.duration_months]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -402,17 +422,29 @@ export default function CustomerForm({
             </select>
           </Field>
 
-          <Field label="Warranty Start" required>
+          <Field label="Purchase Date" required hint="Date the device was bought">
             <input
               type="date"
               required
-              value={values.warranty_start}
-              onChange={(e) => set("warranty_start", e.target.value)}
+              value={purchaseDate}
+              onChange={(e) => setPurchaseDate(e.target.value)}
               className="input-field"
             />
           </Field>
 
-          <Field label="Warranty End" hint="Auto-calculated from plan duration">
+          <Field
+            label="Warranty Start"
+            hint="Auto: purchase + 12 months (after OEM warranty ends)"
+          >
+            <input
+              type="date"
+              value={values.warranty_start}
+              readOnly
+              className="input-field opacity-70 cursor-not-allowed"
+            />
+          </Field>
+
+          <Field label="Warranty End" hint="Auto: start + plan duration">
             <input
               type="date"
               value={values.warranty_end ?? ""}
